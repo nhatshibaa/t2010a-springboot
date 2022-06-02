@@ -1,82 +1,65 @@
 package com.example.t2010aspringboot.controller;
 
 import com.example.t2010aspringboot.entity.Student;
+import com.example.t2010aspringboot.repository.StudentRepository;
+import com.example.t2010aspringboot.service.StudentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/students")
 public class StudentController {
 
-    static List<Student> studentList = new ArrayList<>();
-    {
-        studentList.add(new Student("S001", "duyoccut", "0967238412", "Thai Binh", LocalDateTime.now(), 1));
-        studentList.add(new Student("S002", "duyoccho", "0968878712", "Ha Noi", LocalDateTime.now(), 1));
-        studentList.add(new Student("S003", "duypussyface", "038687291", "Nam Dinh", LocalDateTime.now(), 1));
-        studentList.add(new Student("S004", "duyoclon", "0127868326", "Thai Nguyen", LocalDateTime.now(), 1));
-        studentList.add(new Student("S005", "duyml", "0878723445", "Hai Phong", LocalDateTime.now(), 1));
-    }
+    @Autowired
+    StudentService studentService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<Student> findAll(){
-        return studentList;
-    }
-
-    @RequestMapping(method = RequestMethod.POST)
-    public Student save(@RequestBody Student student){
-        studentList.add(student);
-        return student;
+    public ResponseEntity<List<Student>> getList() {
+        return ResponseEntity.ok(studentService.findAll());
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "{id}")
-    public Student findById(@PathVariable String id){
-        int foundStudent = -1;
-        for (int i = 0; i < studentList.size(); i++) {
-            if (studentList.get(i).getRollNumber().equals(id)){
-                foundStudent = i;
-                break;
-            }
+    public ResponseEntity<?> getDetail(@PathVariable String id) {
+        Optional<Student> optionalAccount = studentService.findById(id);
+        if (!optionalAccount.isPresent()) {
+            ResponseEntity.badRequest().build();
         }
-        if (foundStudent == -1){
-            return null;
-        }
-        return studentList.get(foundStudent);
+        return ResponseEntity.ok(optionalAccount.get());
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity<Student> create(@RequestBody Student student) {
+        return ResponseEntity.ok(studentService.save(student));
     }
 
     @RequestMapping(method = RequestMethod.PUT, path = "{id}")
-    public Student update(@PathVariable String id, @RequestBody Student updateStudent){
-        int foundStudent = -1;
-        for (int i = 0; i < studentList.size(); i++) {
-            if (studentList.get(i).getRollNumber().equals(id)){
-                foundStudent = i;
-                break;
-            }
+    public ResponseEntity<Student> update(@PathVariable String id, @RequestBody Student student) {
+        Optional<Student> optionalStudent = studentService.findById(id);
+        if (!optionalStudent.isPresent()) {
+            ResponseEntity.badRequest().build();
         }
-        if (foundStudent == -1){
-            return null;
-        }
-        Student existStudent = studentList.get(foundStudent);
-        existStudent.setFullName(updateStudent.getFullName());
-        existStudent.setAddress(updateStudent.getAddress());
-        return existStudent;
+        Student existStudent = optionalStudent.get();
+        // map object
+        existStudent.setFullName(student.getFullName());
+        existStudent.setPhone(student.getPhone());
+        existStudent.setAddress(student.getAddress());
+        return ResponseEntity.ok(studentService.save(existStudent));
     }
 
     @RequestMapping(method = RequestMethod.DELETE, path = "{id}")
-    public boolean delete(@PathVariable String id){
-        int foundStudent = -1;
-        for (int i = 0; i < studentList.size(); i++) {
-            if (studentList.get(i).getRollNumber().equals(id)){
-                foundStudent = i;
-                break;
-            }
+    public ResponseEntity<?> delete(@PathVariable String id) {
+        if (!studentService.findById(id).isPresent()) {
+            ResponseEntity.badRequest().build();
         }
-        if (foundStudent ==-1){
-            return false;
-        }
-        studentList.remove(foundStudent);
-        return true;
+        studentService.delete(id);
+        System.out.println("Success");
+        return ResponseEntity.ok().build();
     }
+
 }
