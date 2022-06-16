@@ -1,11 +1,10 @@
 package com.example.t2010aspringboot.repository;
 
+import com.example.t2010aspringboot.entity.Order;
 import com.example.t2010aspringboot.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
-@Repository
-public interface ProductRepository extends JpaRepository<Product, String> {
+public interface OrderRepository extends JpaRepository<Order, String> {
 }
