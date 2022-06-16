@@ -1,12 +1,11 @@
 package com.example.t2010aspringboot.entity;
 
+import com.example.t2010aspringboot.entity.base.BaseEntity;
+import com.example.t2010aspringboot.enums.ProductStatus;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import java.time.LocalDateTime;
+import javax.persistence.*;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "products")
-public class Product {
+public class Product extends BaseEntity {
 
     @Id
     private String id;
@@ -25,11 +24,6 @@ public class Product {
     private double price;
     private String thumbnail;
     private String manufacturer;
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private LocalDateTime deletedAt;
-    private String createdBy;
-    private String updatedBy;
-    private String deletedBy;
+    @Enumerated(EnumType.ORDINAL)
+    private ProductStatus status;
 }
